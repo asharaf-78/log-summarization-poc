@@ -27,14 +27,14 @@ else
 fi
 
 # Docker config
-ECR_REPO="eda/services/bmc" 
+ECR_REPO="eda/services/log-summarization" 
 IMAGE_TAG="latest"
 ECR_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG"
 
 # Kubernetes config
 NAMESPACE="eda-services"
-DEPLOYMENT_NAME="eda-services-bmc-deploy" # NEED TO CHANGE
-SERVICE_NAME="eda-services-bmc-svc" # NEED TO CHANGE
+DEPLOYMENT_NAME="eda-services-log-summarization-deploy" # NEED TO CHANGE
+SERVICE_NAME="eda-services-log-summarization-svc" # NEED TO CHANGE
 DEPLOY_FOLDER="deploy/dev"
 DEPLOYMENT_FILE="deploy.yml"
 # INGRESS_FILE="ingress.yml"

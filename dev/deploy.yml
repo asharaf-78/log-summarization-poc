@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eda-services-bmc-deploy
+  name: eda-services-log-summarization-deploy
   namespace: eda-services
   labels:
-    app.kubernetes.io/name: eda-services-bmc-deploy
+    app.kubernetes.io/name: eda-services-log-summarization-deploy
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: eda-services-bmc-deploy
+      app.kubernetes.io/name: eda-services-log-summarization-deploy
   replicas: 1
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: eda-services-bmc-deploy
+        app.kubernetes.io/name: eda-services-log-summarization-deploy
     spec:
       terminationGracePeriodSeconds: 0
       containers:
-        - name: eda-services-bmc-deploy
-          image: 263789222982.dkr.ecr.us-east-1.amazonaws.com/eda/services/bmc:latest
+        - name: eda-services-log-summarization-deploy
+          image: 263789222982.dkr.ecr.us-east-1.amazonaws.com/eda/services/log-summarization:latest
           ports:
             - name: es-app-port
               containerPort: 8080

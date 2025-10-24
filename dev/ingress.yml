@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: eda-services-bmc-ingress
+  name: eda-services-log-summarization-ingress
   namespace: eda-services
   annotations:
     alb.ingress.kubernetes.io/ingress.class: alb
@@ -21,10 +21,10 @@ spec:
     - host: 1data-api-dev.onetakeda.com
       http:
         paths:
-          - path: /services/bmc-agent
+          - path: /services/log-summarization-agent
             pathType: Prefix
             backend:
               service:
-                name: eda-services-bmc-svc
+                name: eda-services-log-summarization-svc
                 port:
                   name: svcedas-port

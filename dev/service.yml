@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: eda-services-bmc-svc
+  name: eda-services-log-summarization-svc
   namespace: eda-services
   labels:
-    app.kubernetes.io/name: eda-services-bmc-deploy
+    app.kubernetes.io/name: eda-services-log-summarization-deploy
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: eda-services-bmc-deploy
+    app.kubernetes.io/name: eda-services-log-summarization-deploy
   ports:
     - name: svcedas-port
       port: 8080
