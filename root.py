@@ -14,6 +14,8 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+
+
 @app.get("/health")
 def greet_message():
     return JSONResponse(
@@ -21,7 +23,7 @@ def greet_message():
         content={"Response": "Application Root API Reached..."}
     )
 
-@app.post("/chat")
+@app.post("/services/log-summarization-agent/chat")
 async def chat(question:ChatModel):
     try:
         index = check_index_status()
