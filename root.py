@@ -14,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
+app = FastAPI(root_path="/services/log-summarization-agent")
 
 @app.get("/health")
 def greet_message():
@@ -23,7 +23,7 @@ def greet_message():
         content={"Response": "Application Root API Reached..."}
     )
 
-@app.post("/services/log-summarization-agent/chat")
+@app.post("/chat")
 async def chat(question:ChatModel):
     try:
         index = check_index_status()
