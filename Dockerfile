@@ -5,4 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 ENV PYTHONPATH=/app/src
 EXPOSE 8000
-CMD ["uvicorn", "main:app","--port", "8000"]
+CMD ["uvicorn", "root:app","--port", "8000"]
