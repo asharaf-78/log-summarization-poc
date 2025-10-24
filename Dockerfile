@@ -4,5 +4,6 @@ COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 ENV PYTHONPATH=/app/src
-EXPOSE 8000
-CMD ["uvicorn", "main:app","--port", "8000"]
+EXPOSE 8080
+
+CMD ["uvicorn", "root:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
