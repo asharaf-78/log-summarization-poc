@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eda-services-bmc-ingress
+  namespace: eda-services
+  annotations:
+    alb.ingress.kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/subnets: subnet-0e9621e7e21a68d17,subnet-03fefe8d468ba890a,subnet-0358a1fd3812cd25c
+    alb.ingress.kubernetes.io/group.name: dq2-alb
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 8080}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/tags: apms-id=APMS-10612
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:263789222982:certificate/e179f23c-68b5-4c73-ac45-0b2899a2f044
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/healthcheck-port: '8080'
+spec:
+  ingressClassName: alb
+  rules:
+    - host: 1data-api-dev.onetakeda.com
+      http:
+        paths:
+          - path: /services/bmc-agent
+            pathType: Prefix
+            backend:
+              service:
+                name: eda-services-bmc-svc
+                port:
+                  name: svcedas-port
