@@ -37,7 +37,7 @@ def greet_message():
 async def chat(chat:ChatModel):
     try:
         question = chat.query 
-        query_type = chat.query_type 
+        query_type = chat.query_type
         client = VectorSearchClient(disable_notice=True)
         if query_type.lower()=='s3':
             index_name = os.getenv("DATABRICKS_IDMCLOGS_INDEX")
@@ -56,7 +56,7 @@ async def chat(chat:ChatModel):
             response = generate_answer(question,sql_query,answer)
             response["references"] = references
         else:
-            return {"Error":"Please enter correct query type from ['idmc','airflow','delta_table']"}
+            return {"Error":"Please enter correct query type from ['s3','cloudwatch','delta_table']"}
          
         response["follow-up-questions"] = get_follow_up_questions(question,response["response"])
         response["confidence_score"] = get_confindence_score(question,response["response"])
