@@ -1,5 +1,5 @@
 import os
-import sys
+import sys,json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from databricks import sql
 from dotenv import load_dotenv 
@@ -7,6 +7,8 @@ from Utilities.llmUtils import get_databricks_chatmodel
 from Utilities.prompts import structured_prompt
 from langchain_core.prompts import ChatPromptTemplate
 from Utilities.datamodels import QueryOutput
+from langchain_core.tools import tool
+from langchain.agents import create_agent
 
 load_dotenv()
 
@@ -53,32 +55,48 @@ def get_table_details():
         connection.close()
         cursor.close()
 
-
+@tool
 def get_sql_query_and_references(query:str)->dict:
-    """This function is used to generate spark-sql query and references based on users question.""" 
+    """
+    Convert a natural-language request into a valid Spark SQL query and return
+    the tables referenced in that query.
+
+    Input : A User's query.
+    Output: A valid spark-sql query with referenced table  
+       
+    """ 
     try:
         prompt = ChatPromptTemplate.from_template(template = structured_prompt)
         model = get_databricks_chatmodel().with_structured_output(QueryOutput)
         chain = prompt | model
-        response = chain.invoke({"top_k":5,"table_info":get_table_details(),"input":query}) 
+        response = chain.invoke({
+                    "table_info":get_table_details(),
+                    "input":query
+                }) 
         return response
     except Exception as error:
         raise error
-
+@tool
 def execute_query(sql_query:str):
+    "This function is used to execute the spark-sql query and return the result."
     try:
         connection = get_connection()
         cursor = connection.cursor() 
         response = cursor.execute(sql_query)
         return response.fetchall()
     except Exception as error:
-        raise error
-    finally:
-        connection.close()
-        cursor.close()
+        print(error)
+    connection.close()
+    cursor.close()
 
+@tool
 def generate_answer(query,sql_query,result)-> dict:
-    """Answer question using retrieved information as context."""
+    """
+    Generate a natural-language answer using the user query, the Spark SQL query,
+    and the SQL result as context.
+    Returns a dict with:
+      - 'response': the final answer generated from the provided context.
+    """
     try:
         prompt = (
             "Given the following user question, corresponding SPARK-SQL query, "
@@ -99,13 +117,17 @@ def generate_answer(query,sql_query,result)-> dict:
 
 
 # if __name__=='__main__':
-#     query ="How many job has been failed for today? out of all job run for today?"
-#     response = get_sql_query_and_references(query)
-#     sql_query,references = response.query,response.references
-#     answer = execute_query(sql_query)
-#     result = generate_answer(query,sql_query,answer)
-#     result["references"] = references
-#     print(result)
+#     query ="Can you list top 5 jobs which took highest time on 14-Nov 2025?"
+#     agent = create_agent(model=get_databricks_chatmodel(),
+#                          tools=[get_sql_query_and_references,execute_query,generate_answer],
+#                          system_prompt = structured_prompt
+#                          )
+#     result = agent.invoke(
+#         {"messages": [{"role": "user", "content": query}]}
+#     )
+#     response = json.loads(result["messages"][-1].content)
+#     print(response)
+
 
 
 

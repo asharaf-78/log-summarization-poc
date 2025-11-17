@@ -3,7 +3,7 @@ from typing_extensions import List,Annotated
 
 class ChatModel(BaseModel):
     query: str
-    query_type:str
+    platform_type: str
 
 
 class ReponseModel(BaseModel):

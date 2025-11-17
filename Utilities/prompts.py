@@ -26,30 +26,53 @@ raw_prompt = raw_prompt = """
         Query: {query}
         """
 
-structured_prompt = """ Given an input question, create a syntactically correct spark-sql query to run to help find the answer. Unless the user specifies in his question 
-a specific number of examples they wish to obtain, always limit your query to at most {top_k} results. 
-You can order the results by a relevant column to return the most interesting examples in the database.
+structured_prompt = """Given a user question, generate and execute a valid Spark SQL query and provide a clear, user-friendly answer.
+        You have access to these tools (use them strictly in order):
 
-Never query for all the columns from a specific table, only ask for a the few relevant columns given the question.
+        1. get_sql_query_and_references  
+        → Generate a syntactically valid Spark SQL query and return referenced tables.
 
-Pay attention to use only the column names that you can see in the schema description. Be careful to not query for columns that do not exist. 
-Also, pay attention to which column is in which table.
+        2. execute_query  
+        → Execute the SQL query and return raw results.
 
-You can find below tables names and there corresponding schemas.
+        3. generate_answer  
+        → Produce a user-friendly answer using the query, results, and user question.
 
-{table_info}
+        After Step 3, return the final output in this format:
 
-Here is the user question :
+        {{
+        "response": "<user-friendly answer>",
+        "references": "<list of tables used>"
+        }}
 
-question : {input}
+        Guidelines:
+        - Every column in the SQL query must include its table alias—no exceptions. Do not generate any unqualified column names anywhere in the query. If two tables share a column name, always specify which table it belongs to, otherwise the query is invalid.
+        - Unless the user specifies total count otherwise, limit query results to limited rows.  
+        - Select only relevant columns, never use SELECT *.  
+        - Use only columns present in the schema and ensure they belong to the correct table.  
+        - Table names and schemas are provided below:  
+        {table_info}
 
-If you don't know the answer, return:
-{{
-"response": "Sorry, I don't have information on that. Could you please provide more context?",
-"references": []
-}}
+        User question:
+        {input}
 
-DO NOT make any DML statements/query (INSERT, UPDATE, DELETE, DROP etc.) to the database. If user is asking any query on it deny it."""
+        If the answer cannot be determined:
+        {{
+        "response": "Sorry, I don't have information on that. Could you please provide more context?",
+        "references": []
+        }}
+
+        ### Additional Rules
+        1. Retry logic
+        - If the SQL produced fails to execute or is invalid, retry and improve the query 2 more times (total up to 3 attempts) with better reasoning until a syntactically valid Spark SQL query is produced.
+        - On each retry, adjust selection, joins, casts, or filters to fix the syntax/semantic issue you observed.
+
+        2. Intelligent Column Selection  
+        - Infer alternative columns when required ones are missing or null.  
+          Example: If `duration` is null, compute it as `end_timestamp - start_timestamp` if those columns exist.
+
+        2. Forbidden Operations  
+        -  Do NOT generate queries with DML statements (INSERT, UPDATE, DELETE, DROP). Deny such requests."""
 
 
 follow_up_prompt = """
