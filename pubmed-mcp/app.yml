@@ -1,0 +1,6 @@
+command:
+  - python
+  - server/main.py
+name: mcp-server
+dependencies:
+  - requirements.txt
