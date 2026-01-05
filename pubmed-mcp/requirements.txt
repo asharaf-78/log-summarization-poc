@@ -1,3 +1,4 @@
 requests
 fastmcp
 databricks-sdk
+langchain_community
