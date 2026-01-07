@@ -22,4 +22,5 @@ def get_pubmed_data(user_question: str) -> dict:
     return {"pubmed_data": items}
  
 if __name__ == "__main__":
-    mcp.run(transport="http",port=8080)
+
+    mcp.run(transport="http",port=8000)
